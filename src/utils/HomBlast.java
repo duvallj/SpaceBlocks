@@ -27,8 +27,8 @@ public class HomBlast {
 		bodyDef.bullet = true;
 		
 		blast = world.createBody(bodyDef);
-		double xv = -20*Math.sin(angle);
-		double yv = 20*Math.cos(angle);
+		double xv = -10*Math.sin(angle);
+		double yv = 10*Math.cos(angle);
 		Vec2 vel = new Vec2((float)xv, (float)yv);
 		blast.setLinearVelocity(vel);
 		blast.setTransform(bodyDef.position, angle);
@@ -57,8 +57,8 @@ public class HomBlast {
 			float desAngle = findAng(blast.getPosition(), enemy);
 			
 			blast.setTransform(blast.getPosition(), desAngle);
-			double xv = -20*Math.sin(desAngle);
-			double yv = 20*Math.cos(desAngle);
+			double xv = -10*Math.sin(desAngle);
+			double yv = 10*Math.cos(desAngle);
 			Vec2 vel = new Vec2((float)xv, (float)yv);
 			blast.setLinearVelocity(vel);
 		}

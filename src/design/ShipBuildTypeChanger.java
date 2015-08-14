@@ -16,7 +16,7 @@ public class ShipBuildTypeChanger implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		
-		Color block = Color.WHITE;
+		Color block = Color.BLACK;
 		String text = Integer.toString(btc.type);
 		
 		if(btc.type==1){
@@ -26,13 +26,15 @@ public class ShipBuildTypeChanger implements ActionListener{
 		} else if(btc.type==3){
 			block = Color.GRAY;
 		} else if(btc.type==4){
-			block = Color.BLACK;
+			block = Color.WHITE;
 		} else if(btc.type==5){
 			block = Color.GREEN;
 		} else if(btc.type==6){
 			block = Color.ORANGE;
 		} else if(btc.type==7){
 			block = Color.YELLOW;
+		} else if(btc.type==8){
+			block = Color.PINK;
 		}
 		
 		((JButton)arg0.getSource()).setText(text);

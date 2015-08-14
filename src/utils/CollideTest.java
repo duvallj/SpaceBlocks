@@ -19,14 +19,14 @@ public class CollideTest implements ContactListener{
 	public Fixture fb;
 	
 	public CollideTest(ShipBuild p1, ShipBuild p2, World w) throws SlickException{
-		hit = new Sound("Hit.ogg");
+		hit = new Sound("Hit3.ogg");
 		pl1=p1;
 		pl2=p2;
 	}
 
 	@Override
 	public void beginContact(Contact arg0) {
-		hit.play();
+		hit.play(1,0.25f);
 		
 		fa = arg0.m_fixtureA;
 		fb = arg0.m_fixtureB;

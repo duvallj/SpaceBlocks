@@ -1,7 +1,5 @@
 package org;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,9 +13,9 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
 
-import utils.ShipGet;
 import utils.SlickButton;
 import utils.SlickLabel;
+import utils.StarField;
 import utils.jbox2slick;
 
 public class SlickTitleScreen extends ShipGame{
@@ -31,26 +29,24 @@ public class SlickTitleScreen extends ShipGame{
 	private int[] onslaughtScore = new int[2];
 	private int[] collectScore = new int[2];
 	
-	private ShipGame game = new ShipGame("SPACEBLOCKS");
+	private ShipGame game = new SlickShipGet("SPACEBLOCKS");
 	
 	private int gameType = 0;
 	private int numOfEnemies = 1;
 	private int gameLevel = 1;
 	//private java.awt.Image background = (new ImageIcon(SlickTitleScreen.class.getResource("/org/title.png"))).getImage();
-	private Image realBG;
+	//private Image realBG;
 	private SlickLabel[] slickLabels;
 	private SlickButton[] slickButtons;
 	
 	public static void main(String[] args) throws SlickException{
 		
 		Sound s = new Sound("Pickup_Coin.ogg");
-		s.play();
-		
-		refreshShips();
+		s.play(0, 0);
 		
 		try {
 			AppGameContainer container = new AppGameContainer(new SlickTitleScreen("d"));
-			container.setDisplayMode(container.getScreenWidth(), container.getScreenHeight(),false);    		//last arg = fullscreen
+			container.setDisplayMode(container.getScreenWidth(), container.getScreenHeight(),true);    		//last arg = fullscreen
 			ShipGame.tr = new jbox2slick(container.getScreenWidth(), container.getScreenHeight(), 240, 135);
 			container.setShowFPS(false);
 			container.start();
@@ -66,26 +62,30 @@ public class SlickTitleScreen extends ShipGame{
 	@Override
 	public void render(GameContainer arg0, Graphics arg1) throws SlickException {
 		
-		if(!(game instanceof ShipTest || game instanceof ShipOnslaught || game instanceof ShipCollect || game instanceof SlickHelp)){
-			renderTitle(arg1,arg0);
+		StarField.render(arg1);
+		if(!(game instanceof ShipTest || game instanceof ShipOnslaught || game instanceof ShipCollect || game instanceof SlickHelp || game instanceof SlickShipGet)){
+			renderTitle(arg1,arg0); 
 		} else{
 			game.render(arg0, arg1);
 		}
 	}
 	
 	private void renderTitle(Graphics g, GameContainer arg0){
-		final int width = (arg0.getHeight()+25)*434/228;
+		/*final int width = (arg0.getHeight()+25)*434/228;
 		
 		realBG.draw(0,
 					0,
 					width,
 					arg0.getHeight()+25
-		);
+		);*/
+		g.setBackground(Color.black);
 		for(SlickButton s: slickButtons){
 			s.draw(g);
-			g.setColor(Color.black);
+			g.setColor(Color.white);
+			if(s.selected){g.setColor(Color.black);}
 			s.drawText(g);
 		}
+		g.setColor(Color.white);
 		for(SlickLabel s: slickLabels){
 			s.draw(g);
 		}
@@ -94,8 +94,8 @@ public class SlickTitleScreen extends ShipGame{
 	@Override
 	public void init(GameContainer arg0) throws SlickException {
 		
-		slickLabels = new SlickLabel[7];
-		slickButtons = new SlickButton[9];
+		slickLabels = new SlickLabel[9];
+		slickButtons = new SlickButton[10];
 		in = arg0.getInput();
 		game.init(arg0);
 		
@@ -104,11 +104,13 @@ public class SlickTitleScreen extends ShipGame{
 		
 		jbox2slick tr = ShipGame.tr;
 		
+		StarField.randomize(tr.width, tr.height);
+		
 		List<int[]> coords = new ArrayList<int[]>();
 		List<int[]> widths = new ArrayList<int[]>();
 		List<String> texts = new ArrayList<String>();
 		
-		coords.add(tr.toSlick(-38, 19));
+		coords.add(tr.toSlick(-38, 25));
 		widths.add(tr.wToSlick(76, 38));
 		texts.add("PLAY");
 		
@@ -116,8 +118,8 @@ public class SlickTitleScreen extends ShipGame{
 		widths.add(tr.wToSlick(76, 15));
 		texts.add("LOAD SHIPS");
 		
-		coords.add(tr.toSlick(-19, -26));
-		widths.add(tr.wToSlick(38, 11));
+		coords.add(tr.toSlick(-38, -14));
+		widths.add(tr.wToSlick(76, 11));
 		texts.add("help");
 		
 		coords.add(tr.toSlick(19, -41));
@@ -143,6 +145,10 @@ public class SlickTitleScreen extends ShipGame{
 		coords.add(tr.toSlick(101, 45));
 		widths.add(tr.wToSlick(11, 11));
 		texts.add(">");
+		
+		coords.add(tr.toSlick(-38, -26));
+		widths.add(tr.wToSlick(76, 11));
+		texts.add("reset");
 		
 		for(int index=0; index<slickButtons.length; index++){
 			slickButtons[index] = new SlickButton(coords.get(index)[0],coords.get(index)[1],
@@ -190,6 +196,16 @@ public class SlickTitleScreen extends ShipGame{
 		texts.add("1");
 		ali.add(SlickLabel.CENTER_ALIGNED);
 		
+		coords.add(tr.toSlick(57, 59));
+		widths.add(tr.wToSlick(11, 6));
+		texts.add("Enemies");
+		ali.add(SlickLabel.RIGHT_ALIGNED);
+		
+		coords.add(tr.toSlick(57, 44));
+		widths.add(tr.wToSlick(11, 6));
+		texts.add("Level");
+		ali.add(SlickLabel.RIGHT_ALIGNED);
+		
 		for(int index=0; index<slickLabels.length; index++){
 			slickLabels[index] = new SlickLabel(coords.get(index)[0], coords.get(index)[1],
 					1,widths.get(index)[0],texts.get(index),ali.get(index), widths.get(index)[1]);
@@ -199,7 +215,7 @@ public class SlickTitleScreen extends ShipGame{
 			app = (AppGameContainer) arg0;
 		}
 		
-		realBG = new Image("org/title.png");
+		//realBG = new Image("org/title.png");
 		
 	}
 
@@ -231,6 +247,7 @@ public class SlickTitleScreen extends ShipGame{
 			game = new ShipGame("SPACEBLOCKS");
 			game.init(arg0);
 			ShipGame.over = false;
+			StarField.randomize(ShipGame.tr.width, ShipGame.tr.height);
 		}
 		game.update(arg0, arg1);
 		
@@ -243,11 +260,16 @@ public class SlickTitleScreen extends ShipGame{
 		refreshLabels();
 		
 		if(in.isKeyPressed(Input.KEY_F) && in.isKeyDown(Input.KEY_PERIOD)){
-			//arg0.setFullscreen(!arg0.isFullscreen());
+			arg0.setFullscreen(!arg0.isFullscreen());
 		}
 		
 		if(in.isKeyPressed(Input.KEY_ESCAPE)){
-			closeRequested();
+			if(!(game instanceof ShipTest || game instanceof ShipOnslaught || game instanceof ShipCollect || game instanceof SlickHelp || game instanceof SlickShipGet)){
+				closeRequested();
+			}
+			else{
+				game = new ShipGame("SPACEBLOCKS");
+			}
 		}
 	}
 	
@@ -260,12 +282,14 @@ public class SlickTitleScreen extends ShipGame{
 		}
 		
 		if(slickButtons[1].clicked){
-			refreshShips();
+			game = new SlickShipGet("a");
+			game.init(arg0);
 		}
 		
 		if(slickButtons[2].clicked){
 			
 			Image[] pictures = {new Image("org/controlhelp.png"),
+					new Image("org/controlhelp2.png"),
 					new Image("org/battlemode.png"),
 					new Image("org/onslaught.png"),
 					new Image("org/collectionmode.png")
@@ -323,6 +347,10 @@ public class SlickTitleScreen extends ShipGame{
 			refreshLabels();
 		}
 		
+		if(slickButtons[9].clicked || in.isKeyPressed(Input.KEY_R)){
+			resetScore();
+		}
+		
 		if(game instanceof SlickHelp){
 			if(((SlickHelp)game).closeButton.clicked){
 				game = new ShipGame("SPACEBLOCKS");
@@ -349,6 +377,8 @@ public class SlickTitleScreen extends ShipGame{
 			
 			slickLabels[5].shown=false;
 			slickLabels[6].shown=false;
+			slickLabels[7].shown=false;
+			slickLabels[8].shown=false;
 			
 			if(gameType == 0){
 				slickLabels[1].text = Integer.toString(pBattleScore[0]);
@@ -365,6 +395,7 @@ public class SlickTitleScreen extends ShipGame{
 			slickButtons[8].shown=true;
 			
 			slickLabels[6].shown=true;
+			slickLabels[8].shown=true;
 			
 			if(gameType == 1){
 			
@@ -372,6 +403,7 @@ public class SlickTitleScreen extends ShipGame{
 				slickButtons[6].shown=true;
 				
 				slickLabels[5].shown=true;
+				slickLabels[7].shown=true;
 				
 				slickLabels[1].text = Integer.toString(cBattleScore[0]);
 				slickLabels[3].text = Integer.toString(cBattleScore[1]);
@@ -384,6 +416,7 @@ public class SlickTitleScreen extends ShipGame{
 				slickButtons[6].shown=false;
 				
 				slickLabels[5].shown=false;
+				slickLabels[7].shown=false;
 				
 				slickLabels[1].text = Integer.toString(onslaughtScore[0]);
 				slickLabels[3].text = Integer.toString(onslaughtScore[1]);
@@ -409,21 +442,23 @@ public class SlickTitleScreen extends ShipGame{
 		} else if(level ==6){
 			ShipGame.level = 469;
 		} else if(level ==7){		//This is faster than any human
-			ShipGame.level = 200;				//It shoots 5 times a second
+			ShipGame.level = 234;				//It shoots 5 times a second
 		}
 	}
 	
-	private static void refreshShips(){
-		ShipGet get = null;
+	private void resetScore(){
+		switch (gameType){
+			
+		case 0:
+			pBattleScore = new int[2];
+		case 1:
+			cBattleScore = new int[2];
+		case 2:
+			onslaughtScore = new int[2];
+		case 3:
+			collectScore = new int[2];
 		
-		try {
-			get = new ShipGet();
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		
 		}
-		ShipGame.player1Ship = get.player1Ship;
-		ShipGame.player2Ship = get.player2Ship;
 	}
 }

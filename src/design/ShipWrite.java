@@ -21,7 +21,7 @@ public class ShipWrite extends JPanel{
 	
 	private static final long serialVersionUID = 3007964357815614585L;
 
-	public ShipWrite(int[][] ship) throws FileNotFoundException{
+	public ShipWrite(int[][] ship, String ending) throws FileNotFoundException{
 		
 		JFrame frame = new JFrame("Ship writer");
 		
@@ -34,7 +34,7 @@ public class ShipWrite extends JPanel{
                 null, 
                 "");
 		
-		writeShip(ship, shipName);
+		writeShip(ship, shipName+ending);
 	
 	}
 	
@@ -43,7 +43,7 @@ public class ShipWrite extends JPanel{
 		for(byte y=0; y<10; y++){
 			for(byte x=0; x<10; x++){
 				int data = ship[y][x];
-				if(data<0 || data>7){
+				if(data<0 || data>8){
 					ship[y][x]= 0;
 				}
 			}

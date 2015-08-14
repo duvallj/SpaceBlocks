@@ -15,13 +15,13 @@ public class SlickButton {
 	private Color ns2;
 	private Color s1;
 	private Color s2;
-	private String t;
+	public String text;
 	
 	public boolean selected=false;
 	public boolean clicked=false;
 	public boolean shown=true;
 	
-	public SlickButton(int locX, int locY, int width, int height, Color nonSel1, Color nonSel2, Color sel1, Color sel2, int boundaryWidth, String text){
+	public SlickButton(int locX, int locY, int width, int height, Color nonSel1, Color nonSel2, Color sel1, Color sel2, int boundaryWidth, String t){
 		
 		x=locX;
 		y=locY;
@@ -32,7 +32,7 @@ public class SlickButton {
 		s1=sel1;
 		s2=sel2;
 		bW=boundaryWidth;
-		t=text;
+		text=t;
 		
 	}
 	
@@ -81,7 +81,7 @@ public class SlickButton {
 	}
 	public void drawText(Graphics g){
 		if(shown){
-			g.drawString(t, x+w/2-t.length()*5, y+h/2-10);
+			g.drawString(text, x+w/2-text.length()*5, y+h/2-10);
 		}
 	}
 }

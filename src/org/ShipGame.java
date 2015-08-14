@@ -52,6 +52,10 @@ public class ShipGame extends BasicGame implements ShipGameTemplate{
 		
 	}
 	
+	public void getShip(int number){
+		//nothing
+	}
+	
 	@Override
     public boolean closeRequested()
     {

@@ -5,6 +5,7 @@ import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.World;
 import org.newdawn.slick.AppGameContainer;
 import org.newdawn.slick.Color;
+//import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
@@ -51,8 +52,7 @@ public class ShipCollect extends ShipGame{
 	
 	
 	public void render(GameContainer arg0, Graphics arg1) throws SlickException {
-		arg1.setColor(Color.white);
-		arg1.fillRect(0, 0, tr.width, tr.height);
+		arg1.setBackground(Color.black);
 		
 		asteroids.drawAsteroids(arg1);
 		
@@ -141,20 +141,12 @@ public class ShipCollect extends ShipGame{
 				}
 				orbs.genOrb(tr.width/tr.xscale/2-15, tr.height/tr.yscale/2-15);
 			} else{
-			
-				if(!(player1.isBlast(fa) && player1.isBlast(fb)) &&
-						!(player2.isBlast(fa) && player2.isBlast(fb))){
 					
-					player1.deleteFixture(fa);
-					player1.deleteFixture(fb);
-					
-					player2.deleteFixture(fa);
-					player2.deleteFixture(fb);
+					player1.checkDeleteFixture(fa,fb);
+					player2.checkDeleteFixture(fa,fb);
 					
 					asteroids.damageAsteroid(fa);
 					asteroids.damageAsteroid(fb);
-					
-				}
 				
 			}
 			

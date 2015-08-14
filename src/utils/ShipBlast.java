@@ -10,13 +10,12 @@ import org.jbox2d.dynamics.World;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.geom.Circle;
-import org.newdawn.slick.geom.Transform;
 
 public class ShipBlast {
 	
 	public Body blast;
 	public Fixture b;
-	private jbox2slick tr;
+	protected jbox2slick tr;
 	
 	public ShipBlast(World world, float angle, Vec2 startPos, jbox2slick trans, int index){
 		
@@ -26,8 +25,8 @@ public class ShipBlast {
 		bodyDef.bullet = true;
 		
 		blast = world.createBody(bodyDef);
-		double xv = -20*Math.sin(angle);
-		double yv = 20*Math.cos(angle);
+		double xv = -10*Math.sin(angle);
+		double yv = 10*Math.cos(angle);
 		Vec2 vel = new Vec2((float)xv, (float)yv);
 		blast.setLinearVelocity(vel);
 		
@@ -45,7 +44,7 @@ public class ShipBlast {
 		int[] pos = tr.toSlick(blast.getPosition());
 		g.setColor(Color.green);
 		Circle circle = new Circle(pos[0], pos[1], tr.xscale/2);
-		g.fill(circle.transform(new Transform()));
+		g.fill(circle);
 	}
 	
 }

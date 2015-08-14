@@ -61,7 +61,7 @@ public class ShipCPU extends ShipBuild{
 		
 		if(refreshTime>level){
 			lastPosition = new Vec2(newOtherPos.x, newOtherPos.y);
-			
+			lastAllyPosition = new ArrayList<Vec2>();  //This was part of the reason it was lagging
 			for(Vec2 alp: newOtherAllies){
 				lastAllyPosition.add(new Vec2(alp.x, alp.y));
 			}
@@ -69,14 +69,6 @@ public class ShipCPU extends ShipBuild{
 		
 		Vec2 otherPos = lastPosition;
 		ArrayList<Vec2> otherAllies = lastAllyPosition;
-		
-		
-		if(r.nextInt()%2==0){
-			badAngle += r.nextFloat() / level * 3;
-		} else{
-			badAngle -= r.nextFloat() / level * 3;
-		}
-		badAngle %= Math.PI;
 		
 		float angToOther = findAng(position, otherPos);
 		
@@ -239,12 +231,12 @@ public class ShipCPU extends ShipBuild{
 		player.setTransform(position, angle);
 		
 		if(Math.abs(angToOther-angle)<Math.PI/8){		//equivalent of going forward
-			float xv = (float)(0.25f * Math.sin(angle) * thrustBlocks.size() / mass);
-			float yv = (float)(0.25f * Math.cos(angle) * thrustBlocks.size() / mass);
+			float xv = (float)(0.125f * Math.sin(angle) * thrustBlocks.size() / mass);
+			float yv = (float)(0.125f * Math.cos(angle) * thrustBlocks.size() / mass);
 			Vec2 curVel = player.getLinearVelocity();
 			xv = -1 * xv + curVel.x;
 			yv = yv + curVel.y;
-			batteryLeft -= 0.0004f * thrustBlocks.size();
+			batteryLeft -= 0.0006f * thrustBlocks.size();
 			player.setLinearVelocity(new Vec2(xv, yv));
 		}
 		

@@ -19,6 +19,7 @@ public class AsteroidSpawner {
 	
 	public ArrayList<Body> asteroids = new ArrayList<Body>();
 	public ArrayList<Integer> asteroidDamage = new ArrayList<Integer>();
+	public ArrayList<Color> asteroidColors = new ArrayList<Color>();
 	private jbox2slick tr;
 	private World world;
 	
@@ -61,12 +62,12 @@ public class AsteroidSpawner {
 			
 			asteroidDamage.add((int)randomCircle.m_radius * 20);
 			
+			asteroidColors.add(new Color(randint(),randint(),randint()));
+			
 		}
 	}
 	
 	public void drawAsteroids(Graphics g){
-		
-		g.setColor(Color.darkGray);
 		
 		for(int a=0; a<asteroids.size(); a++){
 			
@@ -77,7 +78,7 @@ public class AsteroidSpawner {
 			int[] slickPos = tr.toSlick(asteroid.getPosition());
 			
 			Ellipse e = new Ellipse(slickPos[0], slickPos[1], xRad, yRad);
-			
+			g.setColor(asteroidColors.get(a));
 			g.fill(e);
 			
 		}
@@ -93,9 +94,14 @@ public class AsteroidSpawner {
 				world.destroyBody(asteroids.get(index));
 				asteroids.remove(index);
 				asteroidDamage.remove(index);
+				asteroidColors.remove(index);
 			}
 		}
 		
+	}
+	
+	private int randint(){
+		return (int)(Math.random()*255);
 	}
 	
 }

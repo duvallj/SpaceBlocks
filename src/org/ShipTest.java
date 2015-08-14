@@ -7,13 +7,15 @@ import org.jbox2d.dynamics.Fixture;
 //import org.jbox2d.dynamics.Fixture;
 import org.jbox2d.dynamics.World;
 import org.newdawn.slick.AppGameContainer;
-//import org.newdawn.slick.BasicGame;
 import org.newdawn.slick.Color;
+//import org.newdawn.slick.BasicGame;
+//import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 //import org.newdawn.slick.Sound;
+
 
 import utils.AsteroidSpawner;
 import utils.CollideTest;
@@ -87,8 +89,7 @@ public class ShipTest extends ShipGame{
     
 	public void render(GameContainer arg0, Graphics arg1) throws SlickException {
 		
-		arg1.setColor(Color.white);
-		arg1.fillRect(0, 0, tr.width, tr.height);
+		arg1.setBackground(Color.black);
 		
 		asteroids.drawAsteroids(arg1);
 		
@@ -205,28 +206,18 @@ public class ShipTest extends ShipGame{
 		
 		if(fa != null && fb != null){
 			
-			if(!(player1.isBlast(fa) && player1.isBlast(fb)) &&
-					!(player2.isBlast(fa) && player2.isBlast(fb))){
-				
-				player1.deleteFixture(fa);
-				player1.deleteFixture(fb);
-				
-				player2.deleteFixture(fa);
-				player2.deleteFixture(fb);
+				player1.checkDeleteFixture(fa,fb);
+				player2.checkDeleteFixture(fa,fb);
 				
 				if(mode>=2){
-					player3.deleteFixture(fa);
-					player3.deleteFixture(fb);
+					player3.checkDeleteFixture(fa,fb);
 					if(mode>=3){
-						player4.deleteFixture(fa);
-						player4.deleteFixture(fb);
+						player4.checkDeleteFixture(fa,fb);
 					}
 				}
 				
 				asteroids.damageAsteroid(fa);
 				asteroids.damageAsteroid(fb);
-				
-			}
 		
 		}
 		
@@ -335,10 +326,10 @@ public class ShipTest extends ShipGame{
 				over = true;
 			}
 			if(player2.dead){
-				world.destroyBody(player2.player);
+				cDestroy(player2);
 			}
 			if(player3.dead){
-				world.destroyBody(player3.player);
+				cDestroy(player3);
 			}
 			if(player1.batteryLeft<=0 && player2.batteryLeft<=0 && player3.batteryLeft<=0 ){
 				over = true;
@@ -349,13 +340,13 @@ public class ShipTest extends ShipGame{
 				over = true;
 			}
 			if(player2.dead){
-				world.destroyBody(player2.player);
+				cDestroy(player2);
 			}
 			if(player3.dead){
-				world.destroyBody(player3.player);
+				cDestroy(player3);
 			}
 			if(player4.dead){
-				world.destroyBody(player4.player);
+				cDestroy(player4);
 			}
 			if(player1.batteryLeft<=0 && player2.batteryLeft<=0 && player3.batteryLeft<=0 && player4.batteryLeft <= 0){
 				over = true;
@@ -379,6 +370,16 @@ public class ShipTest extends ShipGame{
 			over = true;
 		}
 		
+	}
+	
+	private void cDestroy(ShipBuild b){
+		world.destroyBody(b.player);
+		for(Fixture f: b.blastLasers){
+			world.destroyBody(f.getBody());
+		}
+		for(Fixture f: b.homBlastLasers){
+			world.destroyBody(f.getBody());
+		}
 	}
 
 }

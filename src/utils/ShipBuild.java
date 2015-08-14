@@ -35,7 +35,7 @@ public class ShipBuild {
 	public int inputForward = Input.KEY_UP;//SEMICOLON;
 	public int inputLeft = Input.KEY_LEFT;//L;
 	public int inputRight = Input.KEY_RIGHT;//APOSTROPHE;
-	public int inputShoot = Input.KEY_ENTER;//COMMA;
+	public int inputShoot = Input.KEY_ENTER;//Comma;
 	public int inputBackward = Input.KEY_DOWN;
 	
 	public ArrayList<int[]> turnBlocks = new ArrayList<int[]>();
@@ -56,12 +56,16 @@ public class ShipBuild {
 	public ArrayList<int[]> homShootRightBlocks = new ArrayList<int[]>();
 	public ArrayList<int[]> homShootDownBlocks = new ArrayList<int[]>();
 	public ArrayList<int[]> allHomShootBlocks = new ArrayList<int[]>();
+
+	public ArrayList<int[]> allExpShootBlocks = new ArrayList<int[]>(); //they are only going to be able to shoot up
 	
 	public ArrayList<Fixture> shipBlocks = new ArrayList<Fixture>();
 	public ArrayList<ShipBlast> blasts = new ArrayList<ShipBlast>();
 	public ArrayList<Fixture> blastLasers= new ArrayList<Fixture>();
 	public ArrayList<HomBlast> homBlasts = new ArrayList<HomBlast>();
 	public ArrayList<Fixture> homBlastLasers= new ArrayList<Fixture>();
+	public ArrayList<ExpBlast> expBlasts = new ArrayList<ExpBlast>();
+	public ArrayList<Fixture> expBlastLasers= new ArrayList<Fixture>();
 	
 	protected jbox2slick tr;
 	protected Sound shoot;
@@ -75,7 +79,7 @@ public class ShipBuild {
 	
 	public ShipBuild(int[][] blocks, World w, jbox2slick converter) throws SlickException{
 		
-		shoot = new Sound("Laser_Shoot.ogg");
+		shoot = new Sound("Laser_Shoot2.ogg");
 		
 		world=w;
 		
@@ -276,6 +280,21 @@ public class ShipBuild {
 					shipBlocks.get(shipBlocks.size()-1).setUserData(coords);
 					
 				}
+				if(type==8){
+					if(a!=0){
+						if(blocks[a-1][b]==0){
+							allExpShootBlocks.add(coords);
+						}
+					} else{allExpShootBlocks.add(coords);}
+					
+					PolygonShape boxDef = new PolygonShape();
+					boxDef.set(thisVert, 4);
+					
+					FixtureDef box = fixture;
+					box.shape = boxDef;
+					shipBlocks.add(player.createFixture(box));
+					shipBlocks.get(shipBlocks.size()-1).setUserData(coords);
+				}
 			}
 			
 		}
@@ -317,14 +336,14 @@ public class ShipBuild {
 			player.setTransform(position, angle);
 			
 			if(input.isKeyDown(inputForward)){
-				float xv = (float)(0.25f * Math.sin(angle) * thrustBlocks.size() / mass);
-				float yv = (float)(0.25f * Math.cos(angle) * thrustBlocks.size() / mass);
+				float xv = (float)(0.125f * Math.sin(angle) * thrustBlocks.size() / mass);
+				float yv = (float)(0.125f * Math.cos(angle) * thrustBlocks.size() / mass);
 				Vec2 curVel = player.getLinearVelocity();
 				xv = -1 * xv + curVel.x;
 				yv = yv + curVel.y;
 				player.setLinearVelocity(new Vec2(xv, yv));
 				
-				batteryLeft -= 0.0004f * thrustBlocks.size();
+				batteryLeft -= 0.0006f * thrustBlocks.size();
 			}
 			
 			if(input.isKeyDown(inputBackward)){
@@ -341,7 +360,7 @@ public class ShipBuild {
 			if(input.isKeyPressed(inputShoot)){
 				
 				shootReg();
-				
+				shootExp();
 			}
 			
 			if(isLongHeld){
@@ -392,6 +411,23 @@ public class ShipBuild {
 			}
 		}
 		
+		for( int s=0; s<expBlasts.size(); s++){
+			Vec2 blastPos = expBlasts.get(s).blast.getPosition();
+			boolean outOfBounds = blastPos.x > xLimit || 
+					blastPos.x < -1 * xLimit || 
+					blastPos.y > yLimit ||
+					blastPos.y < -1 * yLimit;
+			
+			if(expBlasts.get(s).isInRadius(enemyPos)){
+				expBlasts.get(s).explode(this);
+				deleteExpBlast(s);
+			}
+					
+			if(outOfBounds){
+				deleteExpBlast(s);
+			}
+		}
+		
 		this.checkDeath();
 		
 	}
@@ -399,7 +435,7 @@ public class ShipBuild {
 	private void shootReg(){
 
 		if(allShootBlocks.size()>0){
-			shoot.play();
+			shoot.play(1,0.4f);
 			batteryLeft -= 0.04f * allShootBlocks.size();
 		}
 		
@@ -448,7 +484,7 @@ public class ShipBuild {
 	private void shootHom(){
 
 		if(allHomShootBlocks.size()>0){
-			shoot.play();
+			shoot.play(1,0.25f);
 			batteryLeft -= 0.04f * allHomShootBlocks.size();
 		}
 		
@@ -494,6 +530,24 @@ public class ShipBuild {
 		}
 	}
 	
+	private void shootExp(){
+		if(allExpShootBlocks.size()>0){
+			shoot.play(1,0.25f);
+			batteryLeft -= 0.1f * allExpShootBlocks.size();
+		}
+		
+		for(int s=0; s<allExpShootBlocks.size(); s++){
+			
+			Vec2 spawn = player.getWorldPoint(
+					new Vec2(allExpShootBlocks.get(s)[0], 
+							allExpShootBlocks.get(s)[1]+1));
+			
+			expBlasts.add(new ExpBlast(player.getWorld(), angle, spawn, tr, expBlasts.size()));
+			expBlastLasers.add(expBlasts.get(expBlasts.size()-1).b);
+			
+		}
+	}
+	
 	protected void addTime(int t){
 		if(addT){
 			time += t;
@@ -531,12 +585,15 @@ public class ShipBuild {
 		for(int shoot = 0; shoot < allHomShootBlocks.size(); shoot++){
 			drawBox(allHomShootBlocks.get(shoot), g);
 		}
-		
+		g.setColor(Color.pink);
+		for(int shoot=0; shoot<allExpShootBlocks.size(); shoot++)
+			drawBox(allExpShootBlocks.get(shoot), g);
 		g.setColor(Color.yellow);
 		
 		for(int shoot = 0; shoot < batteryBlocks.size(); shoot++){
 			drawBox(batteryBlocks.get(shoot), g);
 		}
+		
 		
 		//This is just a variant on drawBox
 		
@@ -580,7 +637,7 @@ public class ShipBuild {
 		g.setColor(Color.orange);
 		g.fill(new Polygon(slickCoords));
 		
-		g.setColor(Color.black);
+		g.setColor(Color.white);
 		
 		drawBox(new int[2], g);
 		
@@ -589,6 +646,9 @@ public class ShipBuild {
 		}
 		for(HomBlast h: homBlasts){
 			h.drawSelf(g);
+		}
+		for(ExpBlast e: expBlasts){
+			e.drawSelf(g);
 		}
 		
 	}
@@ -622,10 +682,25 @@ public class ShipBuild {
 		homBlastLasers.remove(index);
 	}
 	
+	public void deleteExpBlast(int index){
+		world.destroyBody(expBlasts.get(index).blast);
+		expBlasts.remove(index);
+		expBlastLasers.remove(index);
+	}
+	
 	public void calcForceCPU(Vec2 v, ArrayList<Body> b, ArrayList<Vec2> a, int d){
 		//nothing
 	}
-	
+	private boolean isALaser(Fixture fix){
+		return (blastLasers.contains(fix) || homBlastLasers.contains(fix) || expBlastLasers.contains(fix));
+	}
+	public void checkDeleteFixture(Fixture fa, Fixture fb){
+		if((shipBlocks.contains(fa)&&isALaser(fb))||(shipBlocks.contains(fb)&&isALaser(fa))||(isALaser(fa)&&isALaser(fb))){
+			return;
+		}
+		deleteFixture(fa);
+		deleteFixture(fb);
+	}
 	public void deleteFixture( Fixture fix ){
 		
 		int[] pos = (int[]) fix.getUserData();
@@ -666,6 +741,8 @@ public class ShipBuild {
 				homShootDownBlocks.remove(pos);
 				homShootLeftBlocks.remove(pos);
 				homShootRightBlocks.remove(pos);
+				
+				allExpShootBlocks.remove(pos);
 			}
 			
 		}
@@ -676,6 +753,10 @@ public class ShipBuild {
 		
 		if(homBlastLasers.contains(fix)){
 			deleteHomBlast(homBlastLasers.indexOf(fix));
+		}
+		
+		if(expBlastLasers.contains(fix)){
+			deleteExpBlast(expBlastLasers.indexOf(fix));
 		}
 		
 	}
@@ -702,7 +783,7 @@ public class ShipBuild {
 	}
 	
 	public boolean isBlast(Fixture fix){
-		if(blastLasers.contains(fix) || homBlastLasers.contains(fix)){
+		if(blastLasers.contains(fix) || homBlastLasers.contains(fix) || expBlastLasers.contains(fix)){
 			return true;
 		} else{
 			return false;
